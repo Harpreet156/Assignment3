@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gallery Pagination</title>
+    <style>
+        img {
+            width: 200px; /* Adjust size as needed */
+            margin: 10px;
+        }
+        .pagination {
+            margin: 20px 0;
+        }
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gallery Pagination</h1>
+    <div id="gallery"></div>
+    <div class="pagination" id="pagination"></div>
+    <script>
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        function loadPage(page) {
+            fetch(`/fetch/all/pages/${page}`)
+                .then(response => response.json())
+                .then(data => {
+                    const galleryDiv = document.getElementById('gallery');
+                    galleryDiv.innerHTML = ''; // Clear previous images
+
+                    const paginationDiv = document.getElementById('pagination');
+                    paginationDiv.innerHTML = ''; // Clear previous pagination
+
+                    for (const [fileName, fileContent] of Object.entries(data.files)) {
+                        const img = document.createElement('img');
+                        img.src = `data:image/jpeg;base64,${fileContent}`; // Change MIME type if necessary
+                        img.alt = fileName;
+                        galleryDiv.appendChild(img);
+                    }
+
+                    // Create pagination controls
+                    if (data.page > 1) {
+                        const prevButton = document.createElement('button');
+                        prevButton.innerText = 'Previous';
+                        prevButton.onclick = () => loadPage(data.page - 1);
+                        paginationDiv.appendChild(prevButton);
+                    }
+
+                    paginationDiv.innerText += ` Page ${data.page} of ${data.totalPages} `;
+
+                    if (data.page < data.totalPages) {
+                        const nextButton = document.createElement('button');
+                        nextButton.innerText = 'Next';
+                        nextButton.onclick = () => loadPage(data.page + 1);
+                        paginationDiv.appendChild(nextButton);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching page:', error);
+                });
+        }
+
+        // Load the initial page
+        loadPage(currentPage);
+    </script>
+</body>
+</html>

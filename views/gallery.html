@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gallery</title>
+</head>
+<body>
+    <h1>Gallery</h1>
+    <div id="gallery"></div>
+    <script>
+        fetch('/fetch/all')
+            .then(response => response.json())
+            .then(files => {
+                const galleryDiv = document.getElementById('gallery');
+                for (const [fileName, fileContent] of Object.entries(files)) {
+                    const img = document.createElement('img');
+                    img.src = `data:image/jpeg;base64,${fileContent}`; // Change MIME type if necessary
+                    img.alt = fileName;
+                    img.style.width = "200px"; // Adjust size as needed
+                    img.style.margin = "10px";
+                    galleryDiv.appendChild(img);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching files:', error);
+            });
+    </script>
+</body>
+</html>
